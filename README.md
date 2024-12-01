@@ -44,7 +44,7 @@ pip install Flask
 pip install nltk
 ```
 ### Step 4: Run the Application
-Once the dependencies are installed, navigate to the project directory where the app.py file is located:
+Once the dependencies are installed,Open Command prompt and navigate to the project directory where the app.py file is located:
 
 ```bash
 cd sentiment-analysis
