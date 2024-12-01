@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md space-y-6 border border-gray-100">
+        <div class="flex items-center justify-center space-x-4">
+            <i class="fas fa-comment-dots text-3xl text-purple-600"></i>
+            <h1 class="text-2xl font-bold text-gray-800">Sentiment Analyzer</h1>
+        </div>
+
+        <form id="sentimentForm" class="space-y-4">
+            <textarea 
+                id="textInput"
+                name="text"
+                placeholder="Enter your text here..."
+                class="w-full h-40 p-4 border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
+            ></textarea>
+
+            <button 
+                type="submit"
+                class="w-full flex items-center justify-center bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition duration-300 space-x-2"
+            >
+                <i class="fas fa-magic mr-2"></i>
+                Analyze Sentiment
+            </button>
+        </form>
+
+        <div id="results" class="text-center space-y-4">
+            <!-- Sentiment results will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sentimentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const textInput = document.getElementById('textInput');
+            const resultsDiv = document.getElementById('results');
+            
+            // Clear previous results
+            resultsDiv.innerHTML = '<div class="animate-pulse">Analyzing...</div>';
+
+            // Create FormData
+            const formData = new FormData(e.target);
+
+            // Send request to Flask backend
+            fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Determine dominant sentiment
+                const { positive, negative, neutral } = data;
+                let sentimentType, icon, description;
+
+                if (positive > negative && positive > neutral) {
+                    sentimentType = 'Positive';
+                    icon = '😊';
+                    description = 'Positive Sentiment Detected!';
+                } else if (negative > positive && negative > neutral) {
+                    sentimentType = 'Negative';
+                    icon = '😞';
+                    description = 'Negative Sentiment Detected!';
+                } else {
+                    sentimentType = 'Neutral';
+                    icon = '😐';
+                    description = 'Neutral Sentiment Detected.';
+                }
+
+                // Create results HTML
+                resultsDiv.innerHTML = `
+                    <div class="animate-fadeIn">
+                        <div class="text-6xl mb-4">${icon}</div>
+                        <h2 class="text-xl font-bold text-gray-700">${description}</h2>
+                        <div class="mt-4 bg-gray-100 p-4 rounded-lg">
+                            <div class="flex justify-between mb-2">
+                                <span>Positive</span>
+                                <span>${positive.toFixed(2)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                                <div class="bg-green-500 h-2.5 rounded-full" style="width:${positive}%"></div>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Negative</span>
+                                <span>${negative.toFixed(2)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                                <div class="bg-red-500 h-2.5 rounded-full" style="width:${negative}%"></div>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Neutral</span>
+                                <span>${neutral.toFixed(2)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-gray-500 h-2.5 rounded-full" style="width:${neutral}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = `
+                    <div class="text-red-500">
+                        Error analyzing sentiment. Please try again.
+                    </div>
+                `;
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</body>
+</html>
