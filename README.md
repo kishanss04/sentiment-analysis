@@ -1,4 +1,4 @@
-# sentiment-analysis
+# Sentiment Analysis Tool
 
 This project is a Flask-based web application for sentiment analysis, utilizing NLTK for natural language processing.
 
