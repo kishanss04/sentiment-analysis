@@ -1,4 +1,4 @@
-# SATURN - Sentiment Analysis for User Review on Network
+# SATURN - Sentiment Analysis Tool for User Review on Network
 
 **SATURN** is a sentiment analysis project designed to analyze user reviews on a network, providing an accurate sentiment (positive, negative, or neutral) based on the text input. The tool leverages natural language processing (NLP) with Python's Flask framework and NLTK for text processing.
 
